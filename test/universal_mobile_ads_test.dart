@@ -5,9 +5,9 @@ void main() {
   group('AdNetworkConfig Tests', () {
     test('Resolves test ad units in test mode', () {
       const config = AdNetworkConfig(
-        bannerIdAndroid: 'ca-app-pub-2752141161169735/9999063888',
-        interstitialIdAndroid: 'ca-app-pub-2752141161169735/7642247873',
-        rewardedIdAndroid: 'ca-app-pub-2752141161169735/4866156708',
+        bannerIdAndroid: 'ca-app-pub-0000000000000000/1111111111',
+        interstitialIdAndroid: 'ca-app-pub-0000000000000000/2222222222',
+        rewardedIdAndroid: 'ca-app-pub-0000000000000000/3333333333',
       );
 
       // In test mode, it must return official Google test unit IDs
@@ -18,14 +18,14 @@ void main() {
 
     test('Resolves production ad units in production mode', () {
       const config = AdNetworkConfig(
-        bannerIdAndroid: 'ca-app-pub-2752141161169735/9999063888',
-        interstitialIdAndroid: 'ca-app-pub-2752141161169735/7642247873',
-        rewardedIdAndroid: 'ca-app-pub-2752141161169735/4866156708',
+        bannerIdAndroid: 'ca-app-pub-0000000000000000/1111111111',
+        interstitialIdAndroid: 'ca-app-pub-0000000000000000/2222222222',
+        rewardedIdAndroid: 'ca-app-pub-0000000000000000/3333333333',
       );
 
-      expect(config.getBannerId(isTestMode: false), 'ca-app-pub-2752141161169735/9999063888');
-      expect(config.getInterstitialId(isTestMode: false), 'ca-app-pub-2752141161169735/7642247873');
-      expect(config.getRewardedId(isTestMode: false), 'ca-app-pub-2752141161169735/4866156708');
+      expect(config.getBannerId(isTestMode: false), 'ca-app-pub-0000000000000000/1111111111');
+      expect(config.getInterstitialId(isTestMode: false), 'ca-app-pub-0000000000000000/2222222222');
+      expect(config.getRewardedId(isTestMode: false), 'ca-app-pub-0000000000000000/3333333333');
     });
   });
 
@@ -111,15 +111,15 @@ void main() {
         fallbackNetworks: [AdNetworkType.unity, AdNetworkType.ironSource],
         isTestMode: true,
         adMobConfig: AdNetworkConfig(
-          appIdAndroid: 'ca-app-pub-2752141161169735~8091085841',
-          bannerIdAndroid: 'ca-app-pub-2752141161169735/9999063888',
+          appIdAndroid: 'ca-app-pub-0000000000000000~1111111111',
+          bannerIdAndroid: 'ca-app-pub-0000000000000000/2222222222',
         ),
       );
 
       expect(config.defaultNetwork, AdNetworkType.admob);
       expect(config.fallbackNetworks.length, 2);
       expect(config.isTestMode, true);
-      expect(config.adMobConfig?.appIdAndroid, 'ca-app-pub-2752141161169735~8091085841');
+      expect(config.adMobConfig?.appIdAndroid, 'ca-app-pub-0000000000000000~1111111111');
       expect(config.getConfigFor(AdNetworkType.admob), isNotNull);
       expect(config.getConfigFor(AdNetworkType.unity), isNull);
     });

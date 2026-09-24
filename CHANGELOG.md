@@ -1,3 +1,8 @@
+## 1.0.1
+
+* Replaced sample documentation AdMob IDs with generic placeholders and official Google demo ad units.
+* Updated code documentation examples to use generic placeholders.
+
 ## 1.0.0
 
 * Initial release of `universal_mobile_ads`.

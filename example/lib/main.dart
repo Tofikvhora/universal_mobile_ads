@@ -16,10 +16,10 @@ void main() async {
       // Use test ads in debug mode; uses production IDs in release mode
       isTestMode: kDebugMode,
       adMobConfig: AdNetworkConfig(
-        appIdAndroid: 'ca-app-pub-2752141161169735~8091085841',
-        bannerIdAndroid: 'ca-app-pub-2752141161169735/9999063888',
-        interstitialIdAndroid: 'ca-app-pub-2752141161169735/7642247873',
-        rewardedIdAndroid: 'ca-app-pub-2752141161169735/4866156708',
+        appIdAndroid: 'ca-app-pub-3940256099942544~3347511713',
+        bannerIdAndroid: AdNetworkConfig.testBannerAndroid,
+        interstitialIdAndroid: AdNetworkConfig.testInterstitialAndroid,
+        rewardedIdAndroid: AdNetworkConfig.testRewardedAndroid,
       ),
       interstitialCooldown: Duration(seconds: 15),
       interstitialMinActions: 3,

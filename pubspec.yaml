@@ -1,6 +1,6 @@
 name: universal_mobile_ads
 description: "A unified mobile advertising package for Flutter supporting AdMob mediation, smart ad pacing, fallback waterfalls, and extensible ad networks."
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/imvtechhouse/universal_mobile_ads
 repository: https://github.com/imvtechhouse/universal_mobile_ads
 issue_tracker: https://github.com/imvtechhouse/universal_mobile_ads/issues

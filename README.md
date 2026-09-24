@@ -43,7 +43,7 @@ Add your AdMob App ID inside the `<application>` tag:
         <!-- Replace with your actual AdMob App ID -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-2752141161169735~8091085841"/>
+            android:value="ca-app-pub-YOUR_ADMOB_APP_ID"/>
     </application>
 </manifest>
 ```
@@ -53,7 +53,7 @@ Add your AdMob App ID inside `<dict>`:
 
 ```xml
 <key>GADApplicationIdentifier</key>
-<string>ca-app-pub-2752141161169735~8091085841</string>
+<string>ca-app-pub-YOUR_ADMOB_APP_ID</string>
 <key>SKAdNetworkItems</key>
 <array>
   <dict>
@@ -89,10 +89,10 @@ void main() async {
       // Automatically serves Google test ad units during debug / development
       isTestMode: kDebugMode,
       adMobConfig: AdNetworkConfig(
-        appIdAndroid: 'ca-app-pub-2752141161169735~8091085841',
-        bannerIdAndroid: 'ca-app-pub-2752141161169735/9999063888',
-        interstitialIdAndroid: 'ca-app-pub-2752141161169735/7642247873',
-        rewardedIdAndroid: 'ca-app-pub-2752141161169735/4866156708',
+        appIdAndroid: 'ca-app-pub-YOUR_ADMOB_APP_ID',
+        bannerIdAndroid: 'ca-app-pub-YOUR_BANNER_ID',
+        interstitialIdAndroid: 'ca-app-pub-YOUR_INTERSTITIAL_ID',
+        rewardedIdAndroid: 'ca-app-pub-YOUR_REWARDED_ID',
       ),
       // Pacing rules: show ad every 3 actions with a 15-second cooldown
       interstitialCooldown: Duration(seconds: 15),

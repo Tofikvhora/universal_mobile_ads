@@ -2,7 +2,7 @@ import 'dart:io';
 
 /// Platform-specific Ad Unit ID configurations for an ad network.
 class AdNetworkConfig {
-  /// Android Application ID (e.g. `ca-app-pub-2752141161169735~8091085841`)
+  /// Android Application ID (e.g. `ca-app-pub-YOUR_ADMOB_APP_ID`)
   final String? appIdAndroid;
 
   /// iOS Application ID
