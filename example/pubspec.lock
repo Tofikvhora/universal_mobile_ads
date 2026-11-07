@@ -200,13 +200,21 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.12"
+  unity_ads_plugin:
+    dependency: transitive
+    description:
+      name: unity_ads_plugin
+      sha256: "09b96cc53b1c33b2005d4c126dea82f7a18d22e289a1ec98acf47ce30bde892b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.0"
   universal_mobile_ads:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "1.0.1"
+    version: "1.1.0"
   vector_math:
     dependency: transitive
     description:

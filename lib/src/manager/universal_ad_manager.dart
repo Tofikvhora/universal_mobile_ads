@@ -64,6 +64,16 @@ class UniversalMobileAds {
       await primaryAdapter.initialize(config);
     }
 
+    // Initialize all configured fallback networks
+    for (final fallback in config.fallbackNetworks) {
+      if (fallback != config.defaultNetwork) {
+        final fallbackAdapter = _adapters[fallback];
+        if (fallbackAdapter != null) {
+          await fallbackAdapter.initialize(config);
+        }
+      }
+    }
+
     _isInitialized = true;
     _log("Universal Mobile Ads initialized. Default network: ${config.defaultNetwork.name}");
   }
@@ -112,23 +122,30 @@ class UniversalMobileAds {
     final primaryAdapter = _instance._adapters[_instance._config.defaultNetwork];
     if (primaryAdapter != null && primaryAdapter.isInterstitialReady()) {
       _instance._pacingController.recordAdShown();
-      return primaryAdapter.showInterstitial(
+      final shown = await primaryAdapter.showInterstitial(
         onDismissed: onAdDismissed,
         onFailed: onFailed,
         onClicked: onClicked,
       );
+      if (shown) return true;
     }
 
     // Attempt waterfall fallback networks
     for (final fallback in _instance._config.fallbackNetworks) {
       final fallbackAdapter = _instance._adapters[fallback];
-      if (fallbackAdapter != null && fallbackAdapter.isInterstitialReady()) {
-        _instance._pacingController.recordAdShown();
-        return fallbackAdapter.showInterstitial(
-          onDismissed: onAdDismissed,
-          onFailed: onFailed,
-          onClicked: onClicked,
-        );
+      if (fallbackAdapter != null) {
+        if (!fallbackAdapter.isInterstitialReady()) {
+          await fallbackAdapter.loadInterstitial();
+        }
+        if (fallbackAdapter.isInterstitialReady()) {
+          _instance._pacingController.recordAdShown();
+          final shown = await fallbackAdapter.showInterstitial(
+            onDismissed: onAdDismissed,
+            onFailed: onFailed,
+            onClicked: onClicked,
+          );
+          if (shown) return true;
+        }
       }
     }
 
@@ -150,24 +167,33 @@ class UniversalMobileAds {
 
     final primaryAdapter = _instance._adapters[_instance._config.defaultNetwork];
     if (primaryAdapter != null && primaryAdapter.isRewardedReady()) {
-      return primaryAdapter.showRewarded(
+      final shown = await primaryAdapter.showRewarded(
         onUserEarnedReward: onUserEarnedReward,
         onDismissed: onAdDismissed,
-        onFailed: onFailed,
+        onFailed: (code, message) {
+          // Primary show failed, fallback waterfall will follow
+        },
         onClicked: onClicked,
       );
+      if (shown) return true;
     }
 
     // Waterfall fallback
     for (final fallback in _instance._config.fallbackNetworks) {
       final fallbackAdapter = _instance._adapters[fallback];
-      if (fallbackAdapter != null && fallbackAdapter.isRewardedReady()) {
-        return fallbackAdapter.showRewarded(
-          onUserEarnedReward: onUserEarnedReward,
-          onDismissed: onAdDismissed,
-          onFailed: onFailed,
-          onClicked: onClicked,
-        );
+      if (fallbackAdapter != null) {
+        if (!fallbackAdapter.isRewardedReady()) {
+          await fallbackAdapter.loadRewarded();
+        }
+        if (fallbackAdapter.isRewardedReady()) {
+          final shown = await fallbackAdapter.showRewarded(
+            onUserEarnedReward: onUserEarnedReward,
+            onDismissed: onAdDismissed,
+            onFailed: onFailed,
+            onClicked: onClicked,
+          );
+          if (shown) return true;
+        }
       }
     }
 

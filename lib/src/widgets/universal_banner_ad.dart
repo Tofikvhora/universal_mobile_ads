@@ -3,10 +3,11 @@ import '../core/ad_callbacks.dart';
 import '../core/ad_network_type.dart';
 import '../manager/universal_ad_manager.dart';
 
-/// Ready-to-use drop-in Banner Ad widget.
+/// Ready-to-use drop-in Banner Ad widget with automatic waterfall fallback.
 ///
-/// Automatically respects Pro status and renders a responsive banner ad.
-class UniversalBannerAd extends StatelessWidget {
+/// If the primary ad network fails to fill the banner, it automatically cascades
+/// to fallback networks (such as Unity Ads) seamlessly.
+class UniversalBannerAd extends StatefulWidget {
   /// When true, hides the banner (e.g. for premium / Pro subscribers).
   final bool isProUser;
 
@@ -32,19 +33,50 @@ class UniversalBannerAd extends StatelessWidget {
   });
 
   @override
+  State<UniversalBannerAd> createState() => _UniversalBannerAdState();
+}
+
+class _UniversalBannerAdState extends State<UniversalBannerAd> {
+  late AdNetworkType _activeNetwork;
+  int _fallbackIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _activeNetwork = widget.networkType ?? UniversalMobileAds.instance.config.defaultNetwork;
+  }
+
+  void _handleBannerFailed(int code, String message) {
+    widget.onFailed?.call(code, message);
+
+    final fallbacks = UniversalMobileAds.instance.config.fallbackNetworks;
+    if (_fallbackIndex < fallbacks.length) {
+      final nextNetwork = fallbacks[_fallbackIndex++];
+      if (mounted) {
+        setState(() {
+          _activeNetwork = nextNetwork;
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (isProUser) return const SizedBox.shrink();
+    if (widget.isProUser) return const SizedBox.shrink();
 
     final bannerWidget = UniversalMobileAds.instance.buildBanner(
       context: context,
-      networkType: networkType,
-      onFailed: onFailed,
-      onClicked: onClicked,
+      networkType: _activeNetwork,
+      onFailed: _handleBannerFailed,
+      onClicked: widget.onClicked,
     );
 
     return Padding(
-      padding: padding,
-      child: Center(child: bannerWidget),
+      padding: widget.padding,
+      child: Center(
+        heightFactor: 1.0,
+        child: bannerWidget,
+      ),
     );
   }
 }
