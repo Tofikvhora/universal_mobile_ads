@@ -119,6 +119,27 @@ class UniversalMobileAds {
       return false;
     }
 
+    return showInterstitial(
+      isProUser: isProUser,
+      onAdDismissed: onAdDismissed,
+      onFailed: onFailed,
+      onClicked: onClicked,
+    );
+  }
+
+  /// Displays an interstitial ad immediately with waterfall fallback (e.g. for score milestones).
+  /// Respects Pro user suppression.
+  static Future<bool> showInterstitial({
+    bool isProUser = false,
+    OnAdDismissed? onAdDismissed,
+    OnAdFailedToLoad? onFailed,
+    OnAdClicked? onClicked,
+  }) async {
+    if (!_instance._isInitialized || isProUser) {
+      onAdDismissed?.call();
+      return false;
+    }
+
     final primaryAdapter = _instance._adapters[_instance._config.defaultNetwork];
     if (primaryAdapter != null && primaryAdapter.isInterstitialReady()) {
       _instance._pacingController.recordAdShown();
