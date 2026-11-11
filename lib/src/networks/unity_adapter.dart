@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:unity_ads_plugin/unity_ads_plugin.dart';
@@ -29,6 +30,8 @@ class UnityAdsAdapter implements AdNetworkAdapter {
     final gameId = (Platform.isIOS ? unityConfig.appIdIOS : unityConfig.appIdAndroid) ?? '';
     if (gameId.isEmpty) return;
 
+    final completer = Completer<void>();
+
     try {
       await UnityAds.init(
         gameId: gameId,
@@ -39,13 +42,19 @@ class UnityAdsAdapter implements AdNetworkAdapter {
           // Pre-load interstitial and rewarded placements
           loadInterstitial();
           loadRewarded();
+          if (!completer.isCompleted) completer.complete();
         },
         onFailed: (error, message) {
           _isInitialized = false;
           _log("Unity Ads initialization failed: $error - $message");
+          if (!completer.isCompleted) completer.complete();
         },
       );
       _isInitialized = true;
+      await completer.future.timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {},
+      );
     } catch (e) {
       _log("Error initializing Unity Ads: $e");
     }
@@ -75,6 +84,9 @@ class UnityAdsAdapter implements AdNetworkAdapter {
     final unityConfig = _config?.unityConfig;
     final placementId = (Platform.isIOS ? unityConfig?.interstitialIdIOS : unityConfig?.interstitialIdAndroid) ?? '';
     if (placementId.isEmpty || !_isInitialized) return;
+    if (_isInterstitialLoaded) return;
+
+    final completer = Completer<void>();
 
     try {
       await UnityAds.load(
@@ -82,12 +94,18 @@ class UnityAdsAdapter implements AdNetworkAdapter {
         onComplete: (placement) {
           _isInterstitialLoaded = true;
           _log("Unity Interstitial loaded: $placement");
+          if (!completer.isCompleted) completer.complete();
         },
         onFailed: (placement, error, message) {
           _isInterstitialLoaded = false;
           _log("Unity Interstitial load failed: $error - $message");
           onFailed?.call(-1, message);
+          if (!completer.isCompleted) completer.complete();
         },
+      );
+      await completer.future.timeout(
+        const Duration(seconds: 6),
+        onTimeout: () {},
       );
     } catch (e) {
       _log("Error loading Unity Interstitial: $e");
@@ -111,28 +129,29 @@ class UnityAdsAdapter implements AdNetworkAdapter {
     }
 
     _isInterstitialLoaded = false;
-    var completed = false;
+    final completer = Completer<bool>();
 
     try {
       await UnityAds.showVideoAd(
         placementId: placementId,
         onClick: (placement) => onClicked?.call(),
         onComplete: (placement) {
-          completed = true;
           onDismissed?.call();
           loadInterstitial();
+          if (!completer.isCompleted) completer.complete(true);
         },
         onSkipped: (placement) {
-          completed = true;
           onDismissed?.call();
           loadInterstitial();
+          if (!completer.isCompleted) completer.complete(true);
         },
         onFailed: (placement, error, message) {
           onFailed?.call(-1, message);
           loadInterstitial();
+          if (!completer.isCompleted) completer.complete(false);
         },
       );
-      return completed;
+      return await completer.future;
     } catch (e) {
       _log("Error showing Unity Interstitial: $e");
       onFailed?.call(-1, e.toString());
@@ -145,6 +164,9 @@ class UnityAdsAdapter implements AdNetworkAdapter {
     final unityConfig = _config?.unityConfig;
     final placementId = (Platform.isIOS ? unityConfig?.rewardedIdIOS : unityConfig?.rewardedIdAndroid) ?? '';
     if (placementId.isEmpty || !_isInitialized) return;
+    if (_isRewardedLoaded) return;
+
+    final completer = Completer<void>();
 
     try {
       await UnityAds.load(
@@ -152,12 +174,18 @@ class UnityAdsAdapter implements AdNetworkAdapter {
         onComplete: (placement) {
           _isRewardedLoaded = true;
           _log("Unity Rewarded loaded: $placement");
+          if (!completer.isCompleted) completer.complete();
         },
         onFailed: (placement, error, message) {
           _isRewardedLoaded = false;
           _log("Unity Rewarded load failed: $error - $message");
           onFailed?.call(-1, message);
+          if (!completer.isCompleted) completer.complete();
         },
+      );
+      await completer.future.timeout(
+        const Duration(seconds: 6),
+        onTimeout: () {},
       );
     } catch (e) {
       _log("Error loading Unity Rewarded: $e");
@@ -182,28 +210,30 @@ class UnityAdsAdapter implements AdNetworkAdapter {
     }
 
     _isRewardedLoaded = false;
-    var rewarded = false;
+    final completer = Completer<bool>();
 
     try {
       await UnityAds.showVideoAd(
         placementId: placementId,
         onClick: (placement) => onClicked?.call(),
         onComplete: (placement) {
-          rewarded = true;
           onUserEarnedReward(1, 'unity_reward');
           onDismissed?.call();
           loadRewarded();
+          if (!completer.isCompleted) completer.complete(true);
         },
         onSkipped: (placement) {
           onDismissed?.call();
           loadRewarded();
+          if (!completer.isCompleted) completer.complete(false);
         },
         onFailed: (placement, error, message) {
           onFailed?.call(-1, message);
           loadRewarded();
+          if (!completer.isCompleted) completer.complete(false);
         },
       );
-      return rewarded;
+      return await completer.future;
     } catch (e) {
       _log("Error showing Unity Rewarded: $e");
       onFailed?.call(-1, e.toString());

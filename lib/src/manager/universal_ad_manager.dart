@@ -97,9 +97,15 @@ class UniversalMobileAds {
     final canShowPaced = _instance._pacingController.canShowInterstitial(isProUser: isProUser);
     if (!canShowPaced) return false;
 
-    // Verify at least one adapter has an ad ready
+    // Verify at least one adapter (primary or fallback) has an ad ready
     final primary = _instance._adapters[_instance._config.defaultNetwork];
-    return primary?.isInterstitialReady() ?? false;
+    if (primary?.isInterstitialReady() ?? false) return true;
+    for (final fallback in _instance._config.fallbackNetworks) {
+      if (_instance._adapters[fallback]?.isInterstitialReady() ?? false) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /// Displays an interstitial ad respecting pacing, frequency capping, and Pro status.
@@ -145,7 +151,9 @@ class UniversalMobileAds {
       _instance._pacingController.recordAdShown();
       final shown = await primaryAdapter.showInterstitial(
         onDismissed: onAdDismissed,
-        onFailed: onFailed,
+        onFailed: (code, message) {
+          // Primary show failed, fallback waterfall will follow
+        },
         onClicked: onClicked,
       );
       if (shown) return true;
