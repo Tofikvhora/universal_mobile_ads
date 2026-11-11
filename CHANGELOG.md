@@ -1,3 +1,9 @@
+## 1.1.1
+
+* **Unity Ads Async Callback Resolution**: Fixed `UnityAdsAdapter` (`initialize`, `loadInterstitial`, `showInterstitial`, `loadRewarded`, and `showRewarded`) to await asynchronous `UnityAds` platform callbacks using `Completer<bool>`, ensuring accurate load state and reward completion before resolving.
+* **Improved Interstitial Waterfall Fallback**: Updated `UniversalAdManager.canShowInterstitial` and `showInterstitial` to check both primary and fallback adapters (`AdMob -> Unity Ads`) without firing failure callbacks prematurely when the primary network has no fill.
+* **Gradle 9 Compatibility**: Widened `google_mobile_ads` constraint (`>=5.2.0 <10.0.0`) so projects using Gradle 9+ resolve compatible `google_mobile_ads` releases without `configurations.all` build errors.
+
 ## 1.1.0
 
 * **Unity Ads Support**: Added full production adapter for Unity Ads via `unity_ads_plugin`.

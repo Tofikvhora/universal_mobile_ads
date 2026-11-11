@@ -29,7 +29,7 @@ Add `universal_mobile_ads` to your `pubspec.yaml`:
 dependencies:
   flutter:
     sdk: flutter
-  universal_mobile_ads: ^1.0.0
+  universal_mobile_ads: ^1.1.1
 ```
 
 ### 2. Platform Setup
